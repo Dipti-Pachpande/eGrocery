@@ -21,7 +21,7 @@ public class UserServiceImpl implements UserService {
         try {
             usersRepository.save(userEntity);
         } catch (Exception e) {
-            throw new GroceryException("UserService.REGISTRAION_FAILED");
+            throw new GroceryException("UserService.REGISTRATION_FAILED");
         }
 
         return "UserAPI.REGISTER_USER_SUCCESS";

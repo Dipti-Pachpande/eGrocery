@@ -1,5 +1,6 @@
 package com.assignment.eGrocery.service;
 
+import com.assignment.eGrocery.dto.InventoryDTO;
 import com.assignment.eGrocery.dto.ItemDTO;
 import com.assignment.eGrocery.dto.ModifyItemDTO;
 import com.assignment.eGrocery.entity.Item;
@@ -16,4 +17,6 @@ public interface ItemService {
     List<ItemDTO> getItemsForUser() throws GroceryException;
 
     List<ItemDTO> getItemsForAdmin() throws GroceryException;
+
+    String updateInventory(InventoryDTO inventoryDTO, int itemId) throws GroceryException;
 }

@@ -2,6 +2,7 @@ package com.assignment.eGrocery.controller;
 
 import com.assignment.eGrocery.common.RoleType;
 import com.assignment.eGrocery.dto.AuthDTO;
+import com.assignment.eGrocery.dto.InventoryDTO;
 import com.assignment.eGrocery.dto.ItemDTO;
 import com.assignment.eGrocery.dto.ModifyItemDTO;
 import com.assignment.eGrocery.exception.GroceryException;
@@ -62,6 +63,16 @@ public class ItemController {
             throws GroceryException {
         authorisationService.authorise(itemDTO.getAuth().getUserId(), RoleType.ADMIN.name());
         String message = itemService.updateItem(id, itemDTO);
+        return new ResponseEntity<>(environment.getProperty(message), HttpStatus.OK);
+    }
+
+
+    @PutMapping("/{id}/updateInventory")
+    public ResponseEntity<String> updateInventory(@PathVariable Integer id,
+                                                  @Valid @RequestBody InventoryDTO inventoryDTO)
+            throws GroceryException {
+        authorisationService.authorise(inventoryDTO.getAuth().getUserId(), RoleType.ADMIN.name());
+        String message = itemService.updateInventory(inventoryDTO, id);
         return new ResponseEntity<>(environment.getProperty(message), HttpStatus.OK);
     }
 

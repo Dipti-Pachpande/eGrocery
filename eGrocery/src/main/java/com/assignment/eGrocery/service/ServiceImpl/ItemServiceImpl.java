@@ -1,5 +1,7 @@
 package com.assignment.eGrocery.service.ServiceImpl;
 
+import com.assignment.eGrocery.common.Operation;
+import com.assignment.eGrocery.dto.InventoryDTO;
 import com.assignment.eGrocery.dto.ItemDTO;
 import com.assignment.eGrocery.dto.ModifyItemDTO;
 import com.assignment.eGrocery.entity.Item;
@@ -80,6 +82,16 @@ public class ItemServiceImpl implements ItemService {
         return itemDTOList;
     }
 
+    @Override
+    public String updateInventory(InventoryDTO inventoryDTO, int itemId) throws GroceryException {
+        Item item = findItem(itemId);
+        int updatedQuantity = getUpdatedQuantity(Operation.valueOf(inventoryDTO.getOperation()),
+                item.getAvailableQuantity(),
+                inventoryDTO.getQuantity());
+        item.setAvailableQuantity(updatedQuantity);
+        return "ItemAPI.INVENTORY_UPDATE_SUCCESS";
+    }
+
     private Item findItem(Integer id) throws GroceryException{
 
         Optional<Item> optionalItem = itemRepository.findById(id);
@@ -88,6 +100,23 @@ public class ItemServiceImpl implements ItemService {
             throw new GroceryException("ItemService.ITEM_NOT_FOUND");
         }
         return item;
+    }
+
+    private int getUpdatedQuantity(Operation operationType, int currentValue, int updateBy) {
+        switch(operationType) {
+
+            case ADD -> {
+                return currentValue + updateBy;
+            }
+            case REMOVE -> {
+                return currentValue - updateBy;
+            }
+            case UPDATE -> {
+                return updateBy;
+            }
+            default -> throw new IllegalStateException("Unexpected value: " + operationType);
+        }
+
     }
 
  }
