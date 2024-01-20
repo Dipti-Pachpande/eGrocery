@@ -8,6 +8,8 @@ import com.assignment.eGrocery.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service(value = "userService")
 public class UserServiceImpl implements UserService {
 
@@ -23,5 +25,12 @@ public class UserServiceImpl implements UserService {
         }
 
         return "UserAPI.REGISTER_USER_SUCCESS";
+    }
+
+    @Override
+    public String getRole(int userId) throws GroceryException {
+        Optional<User> optionalUser = usersRepository.findById(userId);
+        User user =optionalUser.orElseThrow(()-> new GroceryException("ABC")); // invailid user
+        return user.getUserRole();
     }
 }

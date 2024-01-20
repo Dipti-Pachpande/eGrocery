@@ -68,7 +68,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemDTO> getItemsForAdmin() throws GroceryException {
-        Iterable<Item> itemList = itemRepository.findAll();
+        Iterable<Item> itemList = itemRepository.findByIsDeletedFalse();
         List<ItemDTO> itemDTOList = new ArrayList<>();
         itemList.forEach((item) ->{
             ItemDTO itemDTO = item.itemEntityToDTO();

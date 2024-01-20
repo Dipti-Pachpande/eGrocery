@@ -8,4 +8,7 @@ import lombok.Data;
 public class ModifyItemDTO {
     private double price;
     private String name;
+
+    @NotNull(message = "Auth Details Required")
+    private AuthDTO auth;
 }

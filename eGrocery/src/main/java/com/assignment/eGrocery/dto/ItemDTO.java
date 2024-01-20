@@ -17,6 +17,9 @@ public class ItemDTO {
     @NotNull(message = "Available Quantity Required")
     private int availableQuantity;
 
+    @NotNull(message = "Auth Details Required")
+    private AuthDTO auth;
+
     public Item itemDTOToEntity() {
         Item item = new Item();
         item.setId(this.id);
