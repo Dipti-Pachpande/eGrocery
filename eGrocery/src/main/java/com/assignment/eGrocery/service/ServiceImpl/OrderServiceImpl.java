@@ -68,9 +68,9 @@ public class OrderServiceImpl implements OrderService {
         order.setUser(user);
         order.setTotalCost(totalCost.get());
         order.setOrderItems(orderItems);
-        orderRepository.save(order);
+        order = orderRepository.save(order);
 
-        return null;
+        return OrderResponseDTO.buildOrderResponseDTO(order);
 
     }
 }

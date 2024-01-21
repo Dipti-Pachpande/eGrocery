@@ -4,6 +4,7 @@ import com.assignment.eGrocery.common.RoleType;
 import com.assignment.eGrocery.dto.AuthDTO;
 import com.assignment.eGrocery.dto.InventoryDTO;
 import com.assignment.eGrocery.dto.ItemDTO;
+import com.assignment.eGrocery.dto.ItemResponseDTO;
 import com.assignment.eGrocery.dto.ModifyItemDTO;
 import com.assignment.eGrocery.exception.GroceryException;
 import com.assignment.eGrocery.service.AuthorisationService;
@@ -42,51 +43,51 @@ public class ItemController {
     UserService userService;
 
     @PostMapping("/addItem")
-    public ResponseEntity<String> addItem(@Valid @RequestBody ItemDTO itemDTO) throws GroceryException {
+    public ResponseEntity<ItemResponseDTO> addItem(@Valid @RequestBody ItemDTO itemDTO) throws GroceryException {
         authorisationService.authorise(itemDTO.getAuth().getUserId(), RoleType.ADMIN.name());
-        String message= itemService.addItem(itemDTO);
-        return new ResponseEntity<>(environment.getProperty(message), HttpStatus.CREATED);
+        ItemResponseDTO itemResponseDTO = itemService.addItem(itemDTO);
+        return new ResponseEntity<>(itemResponseDTO, HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{id}/remove")
     public ResponseEntity<String> removeItem(@PathVariable Integer id, @Valid @RequestBody AuthDTO auth)
             throws GroceryException {
         authorisationService.authorise(auth.getUserId(), RoleType.ADMIN.name());
-        String message = itemService.removeItem(id);
-        return new ResponseEntity<>(environment.getProperty(message), HttpStatus.OK);
+        String message  = itemService.removeItem(id);
+        return new ResponseEntity<>("Item Id : "+ id +" "+ environment.getProperty(message), HttpStatus.OK);
 
     }
 
     @PutMapping("/{id}/update")
-    public ResponseEntity<String> updateItem(@PathVariable Integer id,
+    public ResponseEntity<ItemResponseDTO> updateItem(@PathVariable Integer id,
                                              @Valid @RequestBody ModifyItemDTO itemDTO)
             throws GroceryException {
         authorisationService.authorise(itemDTO.getAuth().getUserId(), RoleType.ADMIN.name());
-        String message = itemService.updateItem(id, itemDTO);
-        return new ResponseEntity<>(environment.getProperty(message), HttpStatus.OK);
+        ItemResponseDTO itemResponseDTO = itemService.updateItem(id, itemDTO);
+        return new ResponseEntity<>(itemResponseDTO, HttpStatus.OK);
     }
 
 
     @PutMapping("/{id}/updateInventory")
-    public ResponseEntity<String> updateInventory(@PathVariable Integer id,
+    public ResponseEntity<ItemResponseDTO> updateInventory(@PathVariable Integer id,
                                                   @Valid @RequestBody InventoryDTO inventoryDTO)
             throws GroceryException {
         authorisationService.authorise(inventoryDTO.getAuth().getUserId(), RoleType.ADMIN.name());
-        String message = itemService.updateInventory(inventoryDTO, id);
-        return new ResponseEntity<>(environment.getProperty(message), HttpStatus.OK);
+        ItemResponseDTO itemResponseDTO = itemService.updateInventory(inventoryDTO, id);
+        return new ResponseEntity<>(itemResponseDTO, HttpStatus.OK);
     }
 
     @GetMapping("/getItems")
-    public ResponseEntity<List<ItemDTO>> getItemsForUser(@Valid @RequestBody AuthDTO auth)
+    public ResponseEntity<List<ItemResponseDTO>> getItemsForUser(@Valid @RequestBody AuthDTO auth)
             throws GroceryException {
-        List<ItemDTO> itemDTOList = new ArrayList<>();
+        List<ItemResponseDTO> itemResponseDTOList = new ArrayList<>();
         String role = userService.getRole(auth.getUserId());
         if(StringUtils.equals(role, RoleType.ADMIN.name())) {
-            itemDTOList = itemService.getItemsForAdmin();
+            itemResponseDTOList = itemService.getItemsForAdmin();
         }
         if(StringUtils.equals(role, RoleType.USER.name())) {
-            itemDTOList = itemService.getItemsForUser();
+            itemResponseDTOList = itemService.getItemsForUser();
         }
-        return new ResponseEntity<>(itemDTOList, HttpStatus.OK);
+        return new ResponseEntity<>(itemResponseDTOList, HttpStatus.OK);
     }
 }

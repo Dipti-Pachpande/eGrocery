@@ -3,6 +3,7 @@ package com.assignment.eGrocery.service.ServiceImpl;
 import com.assignment.eGrocery.common.Operation;
 import com.assignment.eGrocery.dto.InventoryDTO;
 import com.assignment.eGrocery.dto.ItemDTO;
+import com.assignment.eGrocery.dto.ItemResponseDTO;
 import com.assignment.eGrocery.dto.ModifyItemDTO;
 import com.assignment.eGrocery.entity.Item;
 import com.assignment.eGrocery.exception.GroceryException;
@@ -24,14 +25,14 @@ public class ItemServiceImpl implements ItemService {
     @Autowired
     ItemRepository itemRepository;
     @Override
-    public String addItem(ItemDTO itemDTO) throws GroceryException {
+    public ItemResponseDTO addItem(ItemDTO itemDTO) throws GroceryException {
         Item item = itemDTO.itemDTOToEntity();
         try {
-            itemRepository.save(item);
+            item = itemRepository.save(item);
         } catch (Exception e) {
             throw new GroceryException("ItemService.ITEM_ADDITION_FAILED");
         }
-        return "ItemAPI.ITEM_ADDITION_SUCCESS";
+        return ItemResponseDTO.buildItemResponseDTO(item);
     }
 
     @Override
@@ -42,7 +43,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public String updateItem(Integer id, ModifyItemDTO itemDTO) throws GroceryException {
+    public ItemResponseDTO updateItem(Integer id, ModifyItemDTO itemDTO) throws GroceryException {
         Item itemToModify = findItem(id);
         if(itemDTO.getPrice() > 0.0) {
             itemToModify.setPrice(itemDTO.getPrice());
@@ -50,46 +51,47 @@ public class ItemServiceImpl implements ItemService {
         if(!StringUtils.isBlank(itemDTO.getName())) {
             itemToModify.setName(itemDTO.getName());
         }
-        return "ItemAPI.ITEM_UPDATE_SUCCESS";
+        return ItemResponseDTO.buildItemResponseDTO(itemToModify);
     }
 
     @Override
-    public List<ItemDTO> getItemsForUser() throws GroceryException {
+    public List<ItemResponseDTO> getItemsForUser() throws GroceryException {
         List<Item> itemList = itemRepository.findByIsDeletedFalseAndAvailableQuantityGreaterThan(0);
-        List<ItemDTO> itemDTOList = new ArrayList<>();
+        //List<ItemDTO> itemDTOList = new ArrayList<>();
+        List<ItemResponseDTO> itemResponseDTOList = new ArrayList<>();
         if(itemList.isEmpty()) {
-            throw new GroceryException("ItemService.ITEM_NOT_PRESENT");
+            throw new GroceryException("ItemService.ITEMS_NOT_FOUND");
         } else {
             itemList.forEach((item) ->{
-                ItemDTO itemDTO = item.itemEntityToDTO();
-                itemDTOList.add(itemDTO);
+                ItemResponseDTO itemResponseDTO = ItemResponseDTO.buildItemResponseDTO(item);
+                itemResponseDTOList.add(itemResponseDTO);
             });
         }
-         return itemDTOList;
+         return itemResponseDTOList;
     }
 
     @Override
-    public List<ItemDTO> getItemsForAdmin() throws GroceryException {
+    public List<ItemResponseDTO> getItemsForAdmin() throws GroceryException {
         Iterable<Item> itemList = itemRepository.findByIsDeletedFalse();
-        List<ItemDTO> itemDTOList = new ArrayList<>();
+        List<ItemResponseDTO> itemResponseDTOList = new ArrayList<>();
         itemList.forEach((item) ->{
-            ItemDTO itemDTO = item.itemEntityToDTO();
-            itemDTOList.add(itemDTO);
+            ItemResponseDTO itemResponseDTO = ItemResponseDTO.buildItemResponseDTO(item);
+            itemResponseDTOList.add(itemResponseDTO);
         });
-        if(itemDTOList.isEmpty()) {
-            throw new GroceryException("ItemService.ITEM_NOT_PRESENT");
+        if(itemResponseDTOList.isEmpty()) {
+            throw new GroceryException("ItemService.ITEMS_NOT_FOUND");
         }
-        return itemDTOList;
+        return itemResponseDTOList;
     }
 
     @Override
-    public String updateInventory(InventoryDTO inventoryDTO, int itemId) throws GroceryException {
+    public ItemResponseDTO updateInventory(InventoryDTO inventoryDTO, int itemId) throws GroceryException {
         Item item = findItem(itemId);
         int updatedQuantity = getUpdatedQuantity(Operation.valueOf(inventoryDTO.getOperation()),
                 item.getAvailableQuantity(),
                 inventoryDTO.getQuantity());
         item.setAvailableQuantity(updatedQuantity);
-        return "ItemAPI.INVENTORY_UPDATE_SUCCESS";
+        return ItemResponseDTO.buildItemResponseDTO(item);
     }
 
     private Item findItem(Integer id) throws GroceryException{

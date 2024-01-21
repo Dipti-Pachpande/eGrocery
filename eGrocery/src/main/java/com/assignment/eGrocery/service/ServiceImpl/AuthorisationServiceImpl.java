@@ -18,9 +18,9 @@ public class AuthorisationServiceImpl implements AuthorisationService {
     @Override
     public void authorise(int userId, String role) throws GroceryException {
         Optional<User> optionalUser = usersRepository.findById(userId);
-        User user = optionalUser.orElseThrow(()-> new GroceryException("ABC")); //Unauthorised
+        User user = optionalUser.orElseThrow(()-> new GroceryException("AuthorisationService.UNAUTHORISED"));
         if(!StringUtils.equals(role, user.getUserRole())) {
-            throw  new GroceryException("ABC"); // unauthorised
+            throw  new GroceryException("AuthorisationService.UNAUTHORISED");
         }
     }
 }
